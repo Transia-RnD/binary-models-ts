@@ -20,7 +20,7 @@
   "dependencies": {
     "@xrplf/isomorphic": "^1.0.1",
     "ripple-address-codec": "^5.0.0",
-    "winston": "^3.10.0"
+    "winston": "^3.15.0"
   },
   "devDependencies": {
     "@tsconfig/node16": "^16.1.0",
