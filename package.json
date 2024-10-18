@@ -1,0 +1,44 @@
+{
+  "name": "@transia/binary-models",
+  "version": "1.0.0",
+  "description": "Binary Models",
+  "main": "dist/npm/src/index.js",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test:unit": "jest --config=jest.config.unit.js",
+    "lint": "eslint ./src/**/* --ext .ts",
+    "format": "npx prettier --write ./src"
+  },
+  "author": {
+    "name": "Denis Angell",
+    "url": "https://github.com/dangell7"
+  },
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@xrplf/isomorphic": "^1.0.1",
+    "ripple-address-codec": "^5.0.0",
+    "winston": "^3.10.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^16.1.0",
+    "@types/jest": "^29.5.0",
+    "@types/lodash": "^4.14.192",
+    "@typescript-eslint/eslint-plugin": "^5.54.1",
+    "@typescript-eslint/parser": "^5.54.1",
+    "eslint": "^8.36.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "jest": "^29.5.0",
+    "prettier": "^3.0.2",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  }
+}
