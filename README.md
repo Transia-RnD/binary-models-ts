@@ -13,10 +13,10 @@ Binary models allow data to be serialized and deserialized as binary hex using a
 
 ## Installation
 
-To use these utilities, you can install the package via npm:
+To use the binary-models repo, you can install the package via npm or yarn:
 
 ```bash
-npm install your-package-name
+yarn add @transia/binary-models
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ npm install your-package-name
 Import the necessary functions from the package and use them in your project as needed.
 
 ```typescript
-import { uint8ToHex, hexToUInt8 } from 'your-package-name';
+import { uint8ToHex, hexToUInt8 } from '@transia/binary-models';
 
 // Example usage
 const hexValue = uint8ToHex(10);
