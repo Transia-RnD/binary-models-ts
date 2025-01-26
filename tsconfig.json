@@ -19,7 +19,7 @@
      "esModuleInterop": true,
      "skipLibCheck": true,
      "resolveJsonModule": true,
-     "preserveSymlinks": true,
+     "preserveSymlinks": true
    },
    "include": [
      "src/**/*.ts",
