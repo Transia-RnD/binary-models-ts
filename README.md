@@ -2,11 +2,34 @@
 
 Binary models allow data to be serialized and deserialized as binary hex using a binary codec. The base model provides abstract methods for getting metadata and encoding data. Custom models can be derived from the base model and implement their own metadata and encoding methods.
 
-### Encode & Decode
+## Table of Contents
 
-The `encode()` method uses the `encodeModel()` function to serialize a model instance into binary hex. This function iterates through each metadata element of the model, converting each field to its binary hex representation and concatenating the result into a final hex string.
+- [Installation](#installation)
+- [Usage](#usage)
+- [Types](#types)
+- [Encoding Functions](#encoding-functions)
+- [Decoding Functions](#decoding-functions)
+- [License](#license)
 
-The `static decode()` method uses the `decodeModel()` function to deserialize a binary hex string into a model instance. This function takes a hex string and a model class as its arguments. It then iterates through the metadata of the model class to extract each field's hex string representation from the full hex string, convert it back to its original type, and return a new instance of the model class with the deserialized field values.
+## Installation
+
+To use these utilities, you can install the package via npm:
+
+```bash
+npm install your-package-name
+```
+
+## Usage
+
+Import the necessary functions from the package and use them in your project as needed.
+
+```typescript
+import { uint8ToHex, hexToUInt8 } from 'your-package-name';
+
+// Example usage
+const hexValue = uint8ToHex(10);
+const intValue = hexToUInt8('0A');
+```
 
 ### Types
 
@@ -28,3 +51,34 @@ represents the public key of the address, while the version prefix (currently `0
 
 The `getMetadata()` method must be implemented by any BaseModel subclass in order to provide the metadata for the model, specifying the field names and types along with any additional properties such as `maxStringLength`, `maxArrayLength`, and `modelClass`. `encode()` and `decode()` methods are provided for BaseModel to convert a model instance to or from its binary hex representation, using the `encodeModel()` and `decodeModel()` utility functions respectively.
 
+## Encoding Functions
+
+The following functions are available for encoding data types to hexadecimal format:
+
+- `uint8ToHex(value: number): string` - Encodes a UInt8 value to hex.
+- `uint16ToHex(value: number): string` - Encodes a UInt16 value to hex.
+- `uint32ToHex(value: number): string` - Encodes a UInt32 value to hex.
+- `uint64ToHex(value: BigInt): string` - Encodes a UInt64 value to hex.
+- `uint224ToHex(value: BigInt): string` - Encodes a UInt224 value to hex.
+- `varStringToHex(value: string): string` - Encodes a variable-length string to hex.
+- `xflToHex(value: XFL): string` - Encodes an XFL value to hex.
+- `currencyToHex(value: string): string` - Encodes a currency string to hex.
+- `xrpAddressToHex(value: string): string` - Encodes an XRP address to hex.
+- `lengthToHex(value: number, maxStringLength: number): string` - Encodes a length value to hex.
+
+## Decoding Functions
+
+The following functions are available for decoding hexadecimal format to data types:
+
+- `hexToUInt8(hex: string): number` - Decodes a hex string to a UInt8 value.
+- `hexToUInt16(hex: string): number` - Decodes a hex string to a UInt16 value.
+- `hexToUInt64(hex: string): BigInt` - Decodes a hex string to a UInt64 value.
+- `hexToUInt224(hex: string): BigInt` - Decodes a hex string to a UInt224 value.
+- `hexToVarString(hex: string): string` - Decodes a hex string to a variable-length string.
+- `hexToXfl(hex: string): XFL` - Decodes a hex string to an XFL value.
+- `hexToCurrency(hex: string): string` - Decodes a hex string to a currency string.
+- `hexToXRPAddress(hex: string): string` - Decodes a hex string to an XRP address.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
