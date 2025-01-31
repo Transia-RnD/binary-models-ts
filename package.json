@@ -1,6 +1,6 @@
 {
   "name": "@transia/binary-models",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Binary Models",
   "main": "dist/npm/src/index.js",
   "files": [
