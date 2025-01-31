@@ -97,6 +97,7 @@ jobs:
       - name: Install Dependencies
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: yarn install
-        run: yarn run build
+     
+      - run: yarn run build
 
       - run: yarn run test:unit
