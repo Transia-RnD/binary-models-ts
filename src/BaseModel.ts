@@ -24,6 +24,7 @@ export type MetadataElement<T extends BaseModel> = {
   modelClass?: ModelClass<T>
   metadata?: Metadata<T>
   maxArrayLength?: number
+  little?: boolean
 }
 
 export type Metadata<T extends BaseModel = BaseModel> = MetadataElement<T>[]

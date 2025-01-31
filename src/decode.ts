@@ -29,6 +29,7 @@ export function decodeModel<T extends BaseModel>(
     type,
     maxStringLength,
     modelClass: fieldModelClass,
+    little,
   } of metadata) {
     let fieldHex = ''
     switch (type) {
@@ -39,22 +40,22 @@ export function decodeModel<T extends BaseModel>(
         break
       case 'uint16':
         fieldHex = hex.slice(hexIndex, hexIndex + 4)
-        decodedField = decodeField(fieldHex, type)
+        decodedField = decodeField(fieldHex, type, null, little)
         hexIndex += 4
         break
       case 'uint32':
         fieldHex = hex.slice(hexIndex, hexIndex + 8)
-        decodedField = decodeField(fieldHex, type)
+        decodedField = decodeField(fieldHex, type, null, little)
         hexIndex += 8
         break
       case 'uint64':
         fieldHex = hex.slice(hexIndex, hexIndex + 16)
-        decodedField = decodeField(fieldHex, type)
+        decodedField = decodeField(fieldHex, type, null, little)
         hexIndex += 16
         break
       case 'uint224':
         fieldHex = hex.slice(hexIndex, hexIndex + 56)
-        decodedField = decodeField(fieldHex, type)
+        decodedField = decodeField(fieldHex, type, null, little)
         hexIndex += 56
         break
       case 'hash256':
@@ -79,7 +80,7 @@ export function decodeModel<T extends BaseModel>(
         break
       case 'xfl':
         fieldHex = hex.slice(hexIndex, hexIndex + 16)
-        decodedField = decodeField(fieldHex, type)
+        decodedField = decodeField(fieldHex, type, null, little)
         hexIndex += 16
         break
       case 'currency':
@@ -147,6 +148,7 @@ export function decodeMetadata(
     type,
     maxStringLength,
     metadata: modelMetadata,
+    little,
   } of metadata) {
     let fieldHex = ''
     switch (type) {
@@ -157,22 +159,22 @@ export function decodeMetadata(
         break
       case 'uint16':
         fieldHex = hex.slice(hexIndex, hexIndex + 4)
-        decodedField = decodeField(fieldHex, type)
+        decodedField = decodeField(fieldHex, type, null, little)
         hexIndex += 4
         break
       case 'uint32':
         fieldHex = hex.slice(hexIndex, hexIndex + 8)
-        decodedField = decodeField(fieldHex, type)
+        decodedField = decodeField(fieldHex, type, null, little)
         hexIndex += 8
         break
       case 'uint64':
         fieldHex = hex.slice(hexIndex, hexIndex + 16)
-        decodedField = decodeField(fieldHex, type)
+        decodedField = decodeField(fieldHex, type, null, little)
         hexIndex += 16
         break
       case 'uint224':
         fieldHex = hex.slice(hexIndex, hexIndex + 56)
-        decodedField = decodeField(fieldHex, type)
+        decodedField = decodeField(fieldHex, type, null, little)
         hexIndex += 56
         break
       case 'hash256':
@@ -197,7 +199,7 @@ export function decodeMetadata(
         break
       case 'xfl':
         fieldHex = hex.slice(hexIndex, hexIndex + 16)
-        decodedField = decodeField(fieldHex, type)
+        decodedField = decodeField(fieldHex, type, null, little)
         hexIndex += 16
         break
       case 'currency':
@@ -253,19 +255,20 @@ export function decodeMetadata(
 function decodeField(
   hex: string,
   type: string,
-  maxStringLength?: number
+  maxStringLength?: number,
+  little?: boolean
 ): unknown {
   switch (type) {
     case 'uint8':
       return hexToUInt8(hex)
     case 'uint16':
-      return hexToUInt16(hex)
+      return hexToUInt16(hex, little)
     case 'uint32':
-      return hexToUInt32(hex)
+      return hexToUInt32(hex, little)
     case 'uint64':
-      return hexToUInt64(hex)
+      return hexToUInt64(hex, little)
     case 'uint224':
-      return hexToUInt224(hex)
+      return hexToUInt224(hex, little)
     case 'hash256':
       return hex
     case 'publicKey':
@@ -276,7 +279,7 @@ function decodeField(
       }
       return hexToVarString(hex, maxStringLength)
     case 'xfl':
-      return hexToXfl(hex)
+      return hexToXfl(hex, little)
     case 'currency':
       return hexToCurrency(hex)
     case 'xrpAddress':
@@ -294,20 +297,20 @@ export function hexToUInt8(hex: string): UInt8 {
   return parseInt(hex, 16)
 }
 
-export function hexToUInt16(hex: string): UInt16 {
-  return parseInt(hex, 16)
+export function hexToUInt16(hex: string, little = false): UInt16 {
+  return little ? parseInt(flipHex(hex), 16) : parseInt(hex, 16)
 }
 
-export function hexToUInt32(hex: string): UInt32 {
-  return parseInt(hex, 16)
+export function hexToUInt32(hex: string, little = false): UInt32 {
+  return little ? parseInt(flipHex(hex), 16) : parseInt(hex, 16)
 }
 
-export function hexToUInt64(hex: string): UInt64 {
-  return BigInt(`0x${hex}`)
+export function hexToUInt64(hex: string, little = false): UInt64 {
+  return little ? BigInt(`0x${flipHex(hex)}`) : BigInt(`0x${hex}`)
 }
 
-export function hexToUInt224(hex: string): UInt224 {
-  return BigInt(`0x${hex}`)
+export function hexToUInt224(hex: string, little = false): UInt224 {
+  return little ? BigInt(`0x${flipHex(hex)}`) : BigInt(`0x${hex}`)
 }
 
 function hexToVarStringLength(hex: string, maxStringLength: number): number {
@@ -331,11 +334,11 @@ export function hexToVarString(
   return Buffer.from(content, 'hex').toString('utf8').slice(0, length)
 }
 
-export function hexToXfl(hex: string): XFL {
+export function hexToXfl(hex: string, little = false): XFL {
   if (hex === '0000000000000000') {
     return 0
   }
-  const value = flipHex(hex)
+  const value = little ? flipHex(hex) : hex
   const xfl = hexToUInt64(value.slice(0, 16))
   return parseFloat(toString(xfl))
 }

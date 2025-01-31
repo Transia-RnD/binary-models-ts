@@ -1,6 +1,6 @@
 import { decodeAccountID } from 'ripple-address-codec'
 import { stringToHex } from '@xrplf/isomorphic/utils'
-import { floatToLEXfl } from './xfl'
+import { flipHex, floatToXfl } from './xfl'
 import { BaseModel } from './BaseModel'
 import {
   UInt8,
@@ -20,7 +20,13 @@ export function encodeModel<T extends BaseModel>(model: T): string {
   const metadata = model.getMetadata()
 
   let result = ''
-  for (const { field, type, maxStringLength, maxArrayLength } of metadata) {
+  for (const {
+    field,
+    type,
+    maxStringLength,
+    maxArrayLength,
+    little,
+  } of metadata) {
     // @ts-expect-error -- this is functional
     const fieldValue = model[field]
     if (fieldValue === undefined) {
@@ -46,7 +52,7 @@ export function encodeModel<T extends BaseModel>(model: T): string {
         encodedField += encodeModel(model)
       }
     } else {
-      encodedField = encodeField(fieldValue, type, maxStringLength)
+      encodedField = encodeField(fieldValue, type, maxStringLength, little)
     }
 
     result += encodedField
@@ -58,19 +64,20 @@ export function encodeModel<T extends BaseModel>(model: T): string {
 function encodeField(
   fieldValue: unknown,
   type: string,
-  maxStringLength?: number
+  maxStringLength?: number,
+  little?: boolean
 ): string {
   switch (type) {
     case 'uint8':
       return uint8ToHex(fieldValue as UInt8)
     case 'uint16':
-      return uint16ToHex(fieldValue as UInt16)
+      return uint16ToHex(fieldValue as UInt16, little)
     case 'uint32':
-      return uint32ToHex(fieldValue as UInt32)
+      return uint32ToHex(fieldValue as UInt32, little)
     case 'uint64':
-      return uint64ToHex(fieldValue as UInt64)
+      return uint64ToHex(fieldValue as UInt64, little)
     case 'uint224':
-      return uint224ToHex(fieldValue as UInt224)
+      return uint224ToHex(fieldValue as UInt224, little)
     case 'hash256':
       return fieldValue as Hash256
     case 'publicKey':
@@ -81,11 +88,9 @@ function encodeField(
       }
       return varStringToHex(fieldValue as string, maxStringLength)
     case 'xfl':
-      return xflToHex(fieldValue as XFL)
+      return xflToHex(fieldValue as XFL, little)
     case 'currency':
       return currencyToHex(fieldValue as Currency)
-    case 'xrpAddress':
-      return xrpAddressToHex(fieldValue as XRPAddress)
     case 'xrpAddress':
       return xrpAddressToHex(fieldValue as XRPAddress)
     case 'model':
@@ -104,30 +109,33 @@ export function uint8ToHex(value: UInt8): string {
   return value.toString(16).padStart(2, '0').toUpperCase()
 }
 
-export function uint16ToHex(value: UInt32): string {
+export function uint16ToHex(value: UInt32, little = false): string {
   if (value < 0 || value > 2 ** 16 - 1) {
-    throw Error(`Integer ${value} is out of range for uint16 (0-4294967295)`)
+    throw Error(`Integer ${value} is out of range for uint16 (0-65535)`)
   }
-  return value.toString(16).padStart(4, '0').toUpperCase()
+  const hex = value.toString(16).padStart(4, '0').toUpperCase()
+  return little ? flipHex(hex) : hex
 }
 
-export function uint32ToHex(value: UInt32): string {
+export function uint32ToHex(value: UInt32, little = false): string {
   if (value < 0 || value > 2 ** 32 - 1) {
     throw Error(`Integer ${value} is out of range for uint32 (0-4294967295)`)
   }
-  return value.toString(16).padStart(8, '0').toUpperCase()
+  const hex = value.toString(16).padStart(8, '0').toUpperCase()
+  return little ? flipHex(hex) : hex
 }
 
-export function uint64ToHex(value: UInt64): string {
+export function uint64ToHex(value: UInt64, little = false): string {
   if (value < 0 || value > BigInt(18446744073709551615n)) {
     throw Error(
       `Integer ${value} is out of range for uint64 (0-18446744073709551615)`
     )
   }
-  return value.toString(16).padStart(16, '0').toUpperCase()
+  const hex = value.toString(16).padStart(16, '0').toUpperCase()
+  return little ? flipHex(hex) : hex
 }
 
-export function uint224ToHex(value: UInt224): string {
+export function uint224ToHex(value: UInt224, little = false): string {
   if (
     value < 0 ||
     value >
@@ -139,7 +147,8 @@ export function uint224ToHex(value: UInt224): string {
       `Integer ${value} is out of range for uint224 (0-26959946667150639794667015087019630673637144422540572481103610249215)`
     )
   }
-  return value.toString(16).padStart(56, '0').toUpperCase()
+  const hex = value.toString(16).padStart(56, '0').toUpperCase()
+  return little ? flipHex(hex) : hex
 }
 
 export function lengthToHex(value: number, maxStringLength: number): string {
@@ -165,10 +174,13 @@ export function varStringToHex(
   const prefixLength = lengthToHex(value.length, maxStringLength)
   const content = Buffer.from(value, 'utf8').toString('hex')
   const paddedContent = content.padEnd(maxStringLength * 2, '0')
+
   if (
     (prefixLength + paddedContent).toUpperCase().length >
-    maxStringLength * 2 + 2
+    maxStringLength * 2 + Number(prefixLength)
   ) {
+    console.log((prefixLength + paddedContent).toUpperCase().length)
+    console.log(maxStringLength * 2 + 2)
     throw Error(
       `Encoded string length ${value.length} exceeds max length of ${maxStringLength}`
     )
@@ -176,11 +188,13 @@ export function varStringToHex(
   return (prefixLength + paddedContent).toUpperCase()
 }
 
-export function xflToHex(value: XFL): string {
+export function xflToHex(value: XFL, little = false): string {
   if (value === 0) {
     return '0000000000000000'
   }
-  return floatToLEXfl(String(value))
+  const xfl = floatToXfl(value)
+  const hex = xfl.toString(16).toUpperCase()
+  return little ? flipHex(hex) : hex
 }
 
 export function currencyToHex(value: Currency): string {

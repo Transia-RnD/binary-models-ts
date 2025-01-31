@@ -17,6 +17,7 @@ import {
   Currency,
   XRPAddress,
   PublicKey,
+  hexToUInt16,
 } from '../../../dist/npm/src'
 
 describe('decode', () => {
@@ -37,6 +38,26 @@ describe('decode', () => {
       const value = 255
       const hex = 'FF'
       expect(hexToUInt8(hex)).toBe(value)
+    })
+  })
+
+  describe('UInt16', () => {
+    test('single digit', () => {
+      const value = 5
+      const hex = '0005'
+      expect(hexToUInt16(hex)).toBe(value)
+    })
+
+    test('double digit', () => {
+      const value = 10
+      const hex = '000A'
+      expect(hexToUInt16(hex)).toBe(value)
+    })
+
+    test('max digit', () => {
+      const value = 65535
+      const hex = 'FFFF'
+      expect(hexToUInt16(hex)).toBe(value)
     })
   })
 
@@ -140,7 +161,7 @@ describe('decode', () => {
 
   describe('hexToXfl', () => {
     test('float', () => {
-      const testHex = '100080C6A47E8DC354'
+      const testHex = '54C38D7EA4C68000'
       const expectedResult = 10
       expect(hexToXfl(testHex)).toBe(expectedResult)
     })
@@ -207,7 +228,7 @@ describe('decode', () => {
         }
       }
 
-      const sampleEncoded = '0080C6A47E8DC354'
+      const sampleEncoded = '54C38D7EA4C68000'
       const sampleModelDecoded = decodeModel(sampleEncoded, SampleModel)
       const currencyExpected = 10
       expect(sampleModelDecoded.value).toBe(currencyExpected)

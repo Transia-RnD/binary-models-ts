@@ -18,6 +18,7 @@ import {
   Currency,
   XRPAddress,
   PublicKey,
+  uint16ToHex,
 } from '../../../dist/npm/src'
 
 describe('encode', () => {
@@ -50,6 +51,38 @@ describe('encode', () => {
       const value = 256
       const errorMessage = 'Integer 256 is out of range for uint8 (0-255)'
       expect(() => uint8ToHex(value)).toThrow(errorMessage)
+    })
+  })
+
+  describe('UInt16', () => {
+    test('single digit', () => {
+      const value = 5
+      const hex = '0005'
+      expect(uint16ToHex(value)).toBe(hex)
+    })
+
+    test('double digit', () => {
+      const value = 10
+      const hex = '000A'
+      expect(uint16ToHex(value)).toBe(hex)
+    })
+
+    test('max digit', () => {
+      const value = 65535
+      const hex = 'FFFF'
+      expect(uint16ToHex(value)).toBe(hex)
+    })
+
+    test('throws error on negative number', () => {
+      const value = -1
+      const errorMessage = 'Integer -1 is out of range for uint16 (0-65535)'
+      expect(() => uint16ToHex(value)).toThrow(errorMessage)
+    })
+
+    test('throws error on number greater than max', () => {
+      const value = 65536
+      const errorMessage = 'Integer 65536 is out of range for uint16 (0-65535)'
+      expect(() => uint16ToHex(value)).toThrow(errorMessage)
     })
   })
 
@@ -206,7 +239,7 @@ describe('encode', () => {
   describe('xflToHex', () => {
     test('float', () => {
       const testXfl = 10
-      const expectedResult = '0080C6A47E8DC354'
+      const expectedResult = '54C38D7EA4C68000'
       expect(xflToHex(testXfl)).toBe(expectedResult)
     })
   })
@@ -304,7 +337,7 @@ describe('encode', () => {
       const sample = new SampleModel(value)
 
       const hex = encodeModel(sample)
-      expect(hex).toBe('0080C6A47E8DC354')
+      expect(hex).toBe('54C38D7EA4C68000')
     })
 
     test('single xfl field 0', () => {
